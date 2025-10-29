@@ -1,0 +1,13 @@
+# Core
+chatterbox-tts==0.1.0
+torch==2.4.1
+torchaudio==2.4.1
+
+# Serverless + utils
+runpod==1.6.0
+ffmpeg-python==0.2.0
+numpy
+soundfile
+
+# If watermark extraction is used
+perth==0.1.0 ; python_version >= "3.11"
