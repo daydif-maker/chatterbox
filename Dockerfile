@@ -1,49 +1,46 @@
-# Use RunPod base with CUDA 12.2 and Python 3.11
-FROM runpod/base:0.6.2-cuda12.2.0
+# syntax=docker/dockerfile:1.7
+FROM python:3.11-slim
 
-ARG BUILD_REV="stamp-root-2025-10-29-h"
-RUN echo ">>> BUILD STAMP: ${BUILD_REV}"
+ENV PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DEFAULT_TIMEOUT=120
 
-# System packages needed for audio I/O and HTTPS
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
+# --- OS deps commonly required by TTS stacks ---
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    git \
     ffmpeg \
     libsndfile1 \
+    libgl1 \
     ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+ && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Env for predictable installs and Torch archs
-ENV TORCH_CUDA_ARCH_LIST="8.0;8.6;8.9;9.0+PTX" \
-    HF_HOME=/root/.cache/huggingface \
-    TORCH_HOME=/root/.cache/torch
+# --- Make the pip step noisy so we can see real errors if anything fails ---
+RUN python -V && pip -V
 
-# Upgrade pip
-RUN pip install --no-cache-dir --upgrade pip
+# --- (Optional but recommended) Preinstall Torch CPU wheels explicitly ---
+# If you need CUDA on a GPU pod, change the index-url to cu121 wheels instead.
+ARG TORCH_VERSION=2.4.1
+RUN python -m pip install --upgrade pip setuptools wheel && \
+    python -m pip install --index-url https://download.pytorch.org/whl/cpu \
+      torch==${TORCH_VERSION} torchaudio
 
-# Install PyTorch with CUDA 12.1 support FIRST
+# --- Install chatterbox-tts ---
+# If the package is NOT on PyPI, install from Git (most reliable):
+# NOTE: replace <org>/<repo>@<tag-or-commit> with the actual repo/tag.
 RUN pip install --no-cache-dir \
-    --extra-index-url https://download.pytorch.org/whl/cu121 \
-    torch==2.4.1 \
-    torchaudio==2.4.1
+  "git+https://github.com/<org>/<repo>@<tag-or-commit>#egg=chatterbox-tts"
 
-# Install other dependencies
-RUN pip install --no-cache-dir \
-    runpod==1.6.0 \
-    ffmpeg-python==0.2.0 \
-    "numpy>=1.26,<2.0" \
-    "soundfile>=0.12"
+# If it IS on PyPI and supports py3.11, comment the Git line above and uncomment this:
+# RUN pip install --no-cache-dir chatterbox-tts==<pin-exact-version>
 
-# Install chatterbox-tts from PyPI (NOT from git)
-RUN pip install --no-cache-dir chatterbox-tts
+# --- App deps & code (adjust paths if you use a monorepo) ---
+COPY requirements.txt .  # keep this if you have one
+RUN if [ -f requirements.txt ]; then pip install --no-cache-dir -r requirements.txt; fi
 
-# Copy app code
-COPY handler.py /app/handler.py
+COPY . .
 
-# Optional: Pre-download model at build time for faster cold starts
-# Uncomment to bake model into image (adds ~2GB to image size)
-# RUN python -c "from chatterbox.tts import ChatterboxTTS; ChatterboxTTS.from_pretrained(device='cpu')" || true
-
-# Default command
-CMD ["python", "-u", "handler.py"]
+# --- Default command (adjust to your server) ---
+# CMD ["python", "-m", "your_entrypoint"]
