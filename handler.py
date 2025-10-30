@@ -33,7 +33,7 @@ def handler(event):
     language_id = payload.get("language_id")
     cfg_weight = float(payload.get("cfg_weight", 0.5))
     exaggeration = float(payload.get("exaggeration", 0.5))
-    audio_prompt_path = None  # (Optional) Download ref audio if provided
+    audio_prompt_path = None  # (Optional) download if provided
 
     if not text:
         return {"error": "Missing 'text'."}
@@ -61,8 +61,6 @@ def handler(event):
     return {"audio_wav_base64": b64, "sample_rate": sr}
 
 if __name__ == "__main__":
-    # Local test runner (uses test_input.json if you want)
     print(handler({"input": {"text": "Hello from Chatterbox", "language_id": "en"}}))
 
-# Register serverless handler
 runpod.serverless.start({"handler": handler})
