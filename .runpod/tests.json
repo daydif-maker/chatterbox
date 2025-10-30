@@ -1,0 +1,36 @@
+{
+  "tests": [
+    {
+      "name": "basic_en_tts",
+      "input": {
+        "input": {
+          "text": "Hello from Chatterbox on RunPod.",
+          "language_id": "en",
+          "cfg_weight": 0.5,
+          "exaggeration": 0.5
+        }
+      },
+      "timeout": 200000
+    },
+    {
+      "name": "multilingual_es_tts",
+      "input": {
+        "input": {
+          "text": "Este es un ejemplo en español.",
+          "language_id": "es",
+          "cfg_weight": 0.6,
+          "exaggeration": 0.4
+        }
+      },
+      "timeout": 200000
+    }
+  ],
+  "config": {
+    "gpuTypeId": "NVIDIA L4",
+    "gpuCount": 1,
+    "allowedCudaVersions": ["12.8","12.7","12.6","12.5","12.4","12.3","12.2","12.1","12.0"],
+    "env": [
+      { "key": "CHATTERBOX_OUTPUT_FORMAT", "value": "wav" }
+    ]
+  }
+}
