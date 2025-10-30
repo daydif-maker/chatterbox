@@ -1,0 +1,98 @@
+{
+  "title": "Chatterbox",
+  "description": "Fast GPU text-to-speech (English + multilingual) with a simple JSON API.",
+  "type": "serverless",
+  "category": "audio",
+  "iconUrl": "https://raw.githubusercontent.com/daydif-maker/chatterbox/main/.runpod/icon.png",
+  "config": {
+    "runsOn": "GPU",
+    "containerDiskInGb": 20,
+    "gpuCount": 1,
+    "gpuIds": "L4,RTX A4000,-NVIDIA RTX 4090",
+    "allowedCudaVersions": ["12.8","12.7","12.6","12.5","12.4","12.3","12.2","12.1","12.0"],
+    "presets": [
+      {
+        "name": "English (fast default)",
+        "defaults": {
+          "CHATTERBOX_LANGUAGE_ID": "en",
+          "CHATTERBOX_CFG_WEIGHT": "0.5",
+          "CHATTERBOX_EXAGGERATION": "0.5",
+          "CHATTERBOX_OUTPUT_FORMAT": "wav"
+        }
+      },
+      {
+        "name": "Multilingual",
+        "defaults": {
+          "CHATTERBOX_LANGUAGE_ID": "es",
+          "CHATTERBOX_CFG_WEIGHT": "0.6",
+          "CHATTERBOX_EXAGGERATION": "0.4",
+          "CHATTERBOX_OUTPUT_FORMAT": "wav"
+        }
+      }
+    ],
+    "env": [
+      {
+        "key": "HF_TOKEN",
+        "input": {
+          "name": "Hugging Face token (optional)",
+          "type": "string",
+          "description": "Needed only if your models require auth (leave blank otherwise).",
+          "advanced": true
+        }
+      },
+      {
+        "key": "CHATTERBOX_LANGUAGE_ID",
+        "input": {
+          "name": "Language",
+          "type": "string",
+          "description": "Language id for the multilingual model (e.g., en, es, fr, de, ar).",
+          "default": "en"
+        }
+      },
+      {
+        "key": "CHATTERBOX_CFG_WEIGHT",
+        "input": {
+          "name": "CFG weight",
+          "type": "number",
+          "description": "Guidance strength (0.0–1.5).",
+          "min": 0.0,
+          "max": 1.5,
+          "default": 0.5
+        }
+      },
+      {
+        "key": "CHATTERBOX_EXAGGERATION",
+        "input": {
+          "name": "Prosody exaggeration",
+          "type": "number",
+          "description": "Expressiveness (0.0–1.5).",
+          "min": 0.0,
+          "max": 1.5,
+          "default": 0.5
+        }
+      },
+      {
+        "key": "CHATTERBOX_VOICE_PROMPT_URL",
+        "input": {
+          "name": "Voice prompt URL (optional)",
+          "type": "string",
+          "description": "HTTP(S) link to a short reference clip for cloning.",
+          "advanced": true
+        }
+      },
+      {
+        "key": "CHATTERBOX_OUTPUT_FORMAT",
+        "input": {
+          "name": "Output format",
+          "type": "string",
+          "description": "Container for returned audio.",
+          "options": [
+            { "label": "WAV (lossless)", "value": "wav" },
+            { "label": "MP3 (lossy)", "value": "mp3" }
+          ],
+          "default": "wav"
+        }
+      }
+    ]
+  }
+}
