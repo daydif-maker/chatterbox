@@ -1,6 +1,3 @@
-# Keep these aligned with your base Python (3.11) and torch
-torch==2.4.1
-torchaudio==2.4.1
-
-# Numpy/numba pins that often avoid wheel conflicts on slim images
+torch==2.3.1
+torchaudio==2.3.1
 numpy>=1.26,<2.1
