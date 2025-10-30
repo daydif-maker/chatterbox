@@ -1,13 +1,15 @@
-# Core
-chatterbox-tts==0.1.0
-torch==2.4.1
-torchaudio==2.4.1
+# ---- GPU-accelerated Torch stack (must match base image CUDA 12.1) ----
+torch==2.4.1+cu121
+torchaudio==2.4.1+cu121
 
-# Serverless + utils
+# ---- Serverless runtime ----
 runpod==1.6.0
-ffmpeg-python==0.2.0
-numpy
-soundfile
 
-# If watermark extraction is used
-perth==0.1.0 ; python_version >= "3.11"
+# ---- Audio + utilities ----
+ffmpeg-python==0.2.0
+numpy>=1.26
+soundfile>=0.12
+
+# ---- Chatterbox TTS libs ----
+# Pin this to the version your repo expects; adjust if your fork tags differ.
+chatterbox-tts==0.1.0
