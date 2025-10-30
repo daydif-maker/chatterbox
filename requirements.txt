@@ -13,3 +13,5 @@ soundfile>=0.12
 
 # ---- Chatterbox TTS libs ----
 chatterbox-tts==0.1.0
+
+git+https://github.com/<org>/<repo>@<tag-or-commit>#egg=chatterbox-tts
