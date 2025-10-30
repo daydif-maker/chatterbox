@@ -1,7 +1,7 @@
 # Use RunPod base with CUDA 12.2 and Python 3.11
 FROM runpod/base:0.6.2-cuda12.2.0
 
-ARG BUILD_REV="stamp-root-2025-10-29-g"
+ARG BUILD_REV="stamp-root-2025-10-29-h"
 RUN echo ">>> BUILD STAMP: ${BUILD_REV}"
 
 # System packages needed for audio I/O and HTTPS
@@ -10,7 +10,6 @@ RUN apt-get update && \
     ffmpeg \
     libsndfile1 \
     ca-certificates \
-    git \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -20,29 +19,30 @@ ENV TORCH_CUDA_ARCH_LIST="8.0;8.6;8.9;9.0+PTX" \
     HF_HOME=/root/.cache/huggingface \
     TORCH_HOME=/root/.cache/torch
 
-# Upgrade pip first
+# Upgrade pip
 RUN pip install --no-cache-dir --upgrade pip
 
-# Install PyTorch with CUDA 12.1 support FIRST (avoid conflicts)
+# Install PyTorch with CUDA 12.1 support FIRST
 RUN pip install --no-cache-dir \
     --extra-index-url https://download.pytorch.org/whl/cu121 \
     torch==2.4.1 \
     torchaudio==2.4.1
 
-# Install basic dependencies
+# Install other dependencies
 RUN pip install --no-cache-dir \
     runpod==1.6.0 \
     ffmpeg-python==0.2.0 \
     "numpy>=1.26,<2.0" \
     "soundfile>=0.12"
 
-# Install chatterbox-tts from GitHub (0.1.0 doesn't exist on PyPI)
-RUN pip install --no-cache-dir git+https://github.com/resemble-ai/chatterbox.git
+# Install chatterbox-tts from PyPI (NOT from git)
+RUN pip install --no-cache-dir chatterbox-tts
 
 # Copy app code
 COPY handler.py /app/handler.py
 
 # Optional: Pre-download model at build time for faster cold starts
+# Uncomment to bake model into image (adds ~2GB to image size)
 # RUN python -c "from chatterbox.tts import ChatterboxTTS; ChatterboxTTS.from_pretrained(device='cpu')" || true
 
 # Default command
