@@ -1,5 +1,6 @@
-# CUDA 12.1 + Python 3.11 base (matches cu121 wheels below)
 FROM runpod/base:0.6.1-cuda12.1.1-py311
+ARG BUILD_REV="stamp-root-2025-10-29-c"
+RUN echo ">>> BUILD STAMP: ${BUILD_REV}"
 
 # System packages needed for audio I/O and HTTPS
 RUN apt-get update && \
